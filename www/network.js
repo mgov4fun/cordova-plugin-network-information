@@ -49,8 +49,6 @@ NetworkConnection.prototype.getInfo = function (successCallback, errorCallback) 
 };
 
 var me = new NetworkConnection();
-var timerId = null;
-var timeout = 500;
 
 channel.createSticky('onCordovaConnectionReady');
 channel.waitForInitialization('onCordovaConnectionReady');
@@ -59,17 +57,8 @@ channel.onCordovaReady.subscribe(function () {
     me.getInfo(function (info) {
         me.type = info;
         if (info === 'none') {
-            // set a timer if still offline at the end of timer send the offline event
-            timerId = setTimeout(function () {
-                cordova.fireDocumentEvent('offline');
-                timerId = null;
-            }, timeout);
+            cordova.fireDocumentEvent('offline');
         } else {
-            // If there is a current offline event pending clear it
-            if (timerId !== null) {
-                clearTimeout(timerId);
-                timerId = null;
-            }
             cordova.fireDocumentEvent('online');
         }
 
